@@ -1,0 +1,434 @@
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <title>P2P Chat Online | room {{ RoomName }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="P2P Chat Online" name="description">
+    <meta content="Themesbrand" name="author">
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{{url_for('static', filename='images/favicon.ico')}}">
+
+    <!-- magnific-popup css -->
+    <link href="{{url_for('static', filename='js/lib/magnific-popup/magnific-popup.css')}}" rel="stylesheet"
+        type="text/css">
+
+    <!-- owl.carousel css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='js/lib/owl.carousel/assets/owl.carousel.min.css')}}">
+
+    <link rel="stylesheet"
+        href="{{url_for('static', filename='js/lib/owl.carousel/assets/owl.theme.default.min.css')}}">
+
+    <!-- Bootstrap Css -->
+    <link href="{{url_for('static', filename='css/bootstrap-dark.min.css')}}" rel="stylesheet" type="text/css">
+    <!-- Icons Css -->
+    <link href="{{url_for('static', filename='css/icons.min.css')}}" rel="stylesheet" type="text/css">
+    <!-- App Css-->
+    <link href="{{url_for('static', filename='css/app-dark.min.css')}}" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+
+    <div class="layout-wrapper d-lg-flex">
+        <div class="user-chat w-100 user-chat-show">
+            <div class="d-lg-flex">
+
+                <!-- start chat conversation section -->
+                <div class="w-100">
+                    <div class="p-3 p-lg-4 border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col-sm-4 col-8">
+                                <div class="media align-items-center">
+                                    <div class="mr-3">
+                                        <img src="{{url_for('static', filename='images/users/avatar-4.jpg')}}"
+                                            class="rounded-circle avatar-xs" alt="">
+                                    </div>
+                                    <div class="media-body overflow-hidden">
+                                        <h5 class="font-size-16 mb-0 text-truncate"><a href="#"
+                                                class="text-reset user-profile-show">{{ RoomName }}</a> <i
+                                                class="ri-record-circle-fill font-size-10 text-success d-inline-block ml-1"></i>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8 col-4">
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="chat-conversation p-3 p-lg-4" data-simplebar="init">
+                        <div class="simplebar-wrapper" style="margin: -16px;">
+                            <div class="simplebar-height-auto-observer-wrapper">
+                                <div class="simplebar-height-auto-observer"></div>
+                            </div>
+                            <div class="simplebar-mask">
+                                <div class="simplebar-offset" style="right: -16.9412px; bottom: 0px;">
+                                    <div class="simplebar-content-wrapper"
+                                        style="height: 100%; overflow: hidden scroll; padding-right: 20px; padding-bottom: 0px;">
+                                        <div class="simplebar-content" style="padding: 16px;">
+                                            <ul class="list-unstyled mb-0" id="chatlis">
+
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="simplebar-placeholder" style="width: auto; height: 1130px;"></div>
+                        </div>
+                        <div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+                            <div class="simplebar-scrollbar"
+                                style="transform: translate3d(0px, 0px, 0px); display: none;"></div>
+                        </div>
+                        <div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+                            <div class="simplebar-scrollbar"
+                                style="height: 211px; transform: translate3d(0px, 278px, 0px); display: block;"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="p-3 p-lg-4 border-top mb-0">
+                        <div class="row no-gutters">
+                            <div class="col">
+                                <div>
+                                    <input type="text" id="msgbox"
+                                        class="form-control form-control-lg bg-light border-light"
+                                        placeholder="To All in room">
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="chat-input-links ml-md-2">
+                                    <ul class="list-inline mb-0">
+                                        <li class="list-inline-item">
+                                            <button type="button"
+                                                class="btn btn-link text-decoration-none font-size-16 btn-lg waves-effect"
+                                                data-toggle="tooltip" data-placement="top" title=""
+                                                data-original-title="Emoji">
+                                                <i class="ri-emotion-happy-line"></i>
+                                            </button>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <div class="btn-group">
+                                                <button type="button" id="online" class="btn btn-link text-decoration-none font-size-16 btn-lg waves-effect 
+                                                    dropdown-toggle" data-toggle="dropdown" data-placement="top"
+                                                    title="" data-original-title="Choose Connection">
+                                                    <i class="ri-attachment-line"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" id="onlinelis">
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <button type="submit" id="submitit"
+                                                class="btn btn-primary font-size-16 btn-lg chat-send waves-effect waves-light">
+                                                <i class="ri-send-plane-2-fill"></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end chat input section -->
+                </div>
+                <!-- end chat conversation section -->
+
+                <!-- start User profile detail sidebar -->
+
+                <!-- end User profile detail sidebar -->
+            </div>
+        </div>
+        <div id="pub" hidden>{{ pub }}</div>
+    </div>
+    <!-- end  layout wrapper -->
+
+    <!-- JAVASCRIPT -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"
+        integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
+        crossorigin="anonymous"></script>
+    <script src="{{url_for('static', filename='js/lib/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/lib/simplebar/simplebar.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/lib/node-waves/waves.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jsrsasign-latest-all-min.js')}}"></script>
+    <!-- <script type="text/javascript" src="{{url_for('static', filename='js/lz-string.min.js')}}"></script> -->
+    <!-- Magnific Popup-->
+    <script src="{{url_for('static', filename='js/lib/magnific-popup/jquery.magnific-popup.min.js')}}"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/peerjs/1.3.2/peerjs.min.js"></script>
+    <!-- owl.carousel js -->
+    <script src="{{url_for('static', filename='js/lib/owl.carousel/owl.carousel.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jsencrypt.min.js')}}"></script>
+    <!-- page init -->
+    <script src="{{url_for('static', filename='js/pages/index.init.js')}}"></script>
+
+    <script src="{{url_for('static', filename='js/app.js')}}"></script>
+    <script type="text/javascript">
+        var sever_pub = null;
+        $(document).ready(function () {
+            sever_pub = $('#pub').text();
+        });
+        var socket = io();
+        function bin2text(bin) { return btoa(String.fromCharCode(...new Uint8Array(bin))); }
+        var mypub = null;
+        var mysec = null;
+        var url = window.location.href;
+        var index = url.lastIndexOf("\/");
+        var roomnm = url.substring(index + 1, url.length);
+        var onlinelis_all = [];
+        var onlinelis_uuid = [];
+        var onlinelis_pub = [];
+        var peer_to = null;
+        var peer = null;
+        var connectdic = {};
+        var sendtoalllist = [];
+        var relaylist = [];
+
+        window.crypto.subtle.generateKey(
+            {
+                name: "RSA-OAEP",
+                modulusLength: 2048, //can be 1024, 2048, or 4096
+                publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+                hash: { name: "SHA-256" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+            },
+            true, //whether the key is extractable (i.e. can be used in exportKey)
+            ["encrypt", "decrypt"] //must be ["encrypt", "decrypt"] or ["wrapKey", "unwrapKey"]
+        )
+            .then(function (key) {
+                //returns a keypair object
+                window.crypto.subtle.exportKey(
+                    "pkcs8", //can be "jwk" (public or private), "spki" (public only), or "pkcs8" (private only)
+                    key.privateKey //can be a publicKey or privateKey, as long as extractable was true
+                )
+                    .then(function (keydata) {
+                        mysec = bin2text(keydata);
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                    });
+                window.crypto.subtle.exportKey(
+                    "spki", //can be "jwk" (public or private), "spki" (public only), or "pkcs8" (private only)
+                    key.publicKey //can be a publicKey or privateKey, as long as extractable was true
+                )
+                    .then(function (keydata) {
+                        //returns the exported key data
+                        mypub = bin2text(keydata);
+                        let Config = {
+                            'iceServers': [
+                                { url: 'stun:stun.l.google.com:19302' },
+                                { url: 'stun:stun1.l.google.com:19302' },
+                                { url: 'stun:stun2.l.google.com:19302' },
+                                { url: 'stun:stun3.l.google.com:19302' },
+                                { url: 'turn:turn.anyfirewall.com:443?transport=tcp', credential: 'webrtc', username: 'webrtc' }
+                            ]
+                        }
+                        peer = new Peer({ config: Config, host: 'chat.190542.xyz', port: 10010, secure: true, path: '/', debug: 3 })
+                        peer.on("open", function () {
+                            socket.emit('join', { "room": roomnm, "uuid": peer.id, 'pub': mypub });
+                            socket.emit('getpeoplelist', { "room": roomnm });
+                        });
+                        /*{"type":"p2p/all/relay","time":time,"data":data(if relay send encrypt:uuid:msg)}
+                        */
+                        peer.on('connection', function (conn) {
+                            conn.on('data', function (data) {
+                                console.log(data);
+                                if (data['type'] == "p2p") {
+                                    addto(data['data'], data['time'], 0, data['uuid']);
+                                } else if (data['type'] == "relay") {
+                                    if (checkednohash(data['data'], relaylist)) {
+                                        let trytodata = decryptit(data['data']);
+                                        if (trytodata === false) {
+                                            sendtoothers(data);
+                                        } else {
+                                            addto(trytodata, data['time'], 0, data['uuid']);
+                                        }
+                                    }
+                                } else if (data['type'] == "all") {
+                                    if (checkednohash(data['data'], sendtoalllist)) {
+                                        console.log(data['data'],sendtoalllist);
+                                        addto(data['data'], data['time'], 0, data['uuid']);
+                                        sendtoothers(data);
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                    });
+            })
+            .catch(function (err) {
+                console.error(err);
+            }
+            );
+        Date.prototype.Format = function (fmt) { //author: meizz 
+            var o = {
+                "M+": this.getMonth() + 1, //月份 
+                "d+": this.getDate(), //日 
+                "h+": this.getHours(), //小时 
+                "m+": this.getMinutes(), //分 
+                "s+": this.getSeconds(), //秒 
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+                "S": this.getMilliseconds() //毫秒 
+            };
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
+        var arr = new Uint16Array(1);
+        var crypto = window.crypto || window.webkitCrypto
+            || window.mozCrypto || window.oCrypto || window.msCrypto;
+        window.crypto.getRandomValues(arr);
+        for (var i = 0; i < arr.length; i++) {
+            arr = arr[i];
+        }
+
+        function checkednohash(msg, list) {
+            if(list.indexOf(msg) != -1){
+                return false
+            }else{
+                list.push(msg);
+                return true;
+            }
+        }
+        function sendtoothers(data) {
+            if (onlinelis_uuid.length == 0) { return false; }
+            var rdmpr = onlinelis_uuid[Math.floor((Math.random() * onlinelis_uuid.length))]
+            if (connectdic[rdmpr]) {
+                for (var key in connectdic) {
+                    if (!connectdic[key].open) { delete connectdic[key]; continue; }
+                    connectdic[key].send(data);
+                }
+            } else {
+                connectdic[rdmpr] = peer.connect(rdmpr);
+                connectdic[rdmpr].on('open', function () {
+                    // connectdic[rdmpr].send("through");
+                    for (var key in connectdic) {
+                        if (!connectdic[key].open) { delete connectdic[key];continue; }
+                        connectdic[key].send(data);
+                    }
+                })
+            }
+        }
+        function addto(msg, time, pos, name) {
+            if (pos == 0) {
+                var classright = "";
+            } else {
+                var classright = 'class="right"';
+            }
+            var toadd = `<li ` + classright + `>
+                                    <div class="conversation-list">
+                                        <div class="chat-avatar">
+                                            <img src="{{url_for('static', filename='images/users/avatar-4.jpg')}}" alt="">
+                                        </div>    
+                                        <div class="user-chat-content">
+                                            <div class="ctext-wrap">
+                                                <div class="ctext-wrap-content">
+                                                    <p class="mb-0">
+                                                        `+ msg + `
+                                                    </p>
+                                                    <p class="chat-time mb-0"><i class="ri-time-line align-middle"></i> <span class="align-middle">`+ new Date(time).Format("yyyy-MM-dd hh:mm:ss") + `</span></p>
+                                                </div>
+                                                <div class="dropdown align-self-start">
+                                                    <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i class="ri-more-2-fill"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="conversation-name">`+ name + `</div>
+                                        </div>
+                                    </div>
+                                </li>`
+            $("#chatlis").append(toadd);
+        }
+
+        function encryptit(msg, peerpb) {
+            var pkofpeer = KEYUTIL.getKey(peerpb);
+            var enc = KJUR.crypto.Cipher.encrypt(msg, pkofpeer);
+            return enc;
+        }
+
+        function decryptit(msg) {
+            var prvofmine = KEYUTIL.getKey(mysec)
+            try {
+                var dec = KJUR.crypto.Cipher.decrypt(msg, prvofmine);
+            } catch {
+                return false;
+            }
+            return dec;
+        }
+
+        $("#online").click(function () {
+            socket.emit('getpeoplelist', { "room": roomnm });
+            $("#onlinelis").text("");
+            if (onlinelis_uuid.length != 0) {
+                $("#onlinelis").append('<li><button class="btn btn-primary" id="onlinebutton">send to all</button></li>');
+            }
+            else {
+                $("#onlinelis").text("No Online People Except U");
+            }
+            for (let i = 0; i < onlinelis_uuid.length; i++) {
+                if (onlinelis_uuid[i] != peer.id) {
+                    $("#onlinelis").append('<li><button class="btn btn-primary" id="onlinebutton">' + onlinelis_uuid[i] + '</button></li>')
+                }
+            }
+        })
+        $("#onlinelis").on("click", "#onlinebutton", function (event) {
+            if (event.currentTarget.innerHTML != "send to all") {
+                $("#msgbox").attr("placeholder", "to " + event.currentTarget.innerHTML + " in room");
+                peer_to = event.currentTarget.innerHTML;
+            } else {
+                peer_to = null;
+                $("#msgbox").attr("placeholder", "Click attach-file to choose person first");
+            }
+        })
+        $("#submitit").click(function () {
+            var val=$("#msgbox").val();
+            if (peer_to != null && val != "") {
+                if (!connectdic[peer_to] || !connectdic[peer_to].open) {
+                    connectdic[peer_to] = peer.connect(peer_to);
+                }
+                connectdic[peer_to].on('open', function () {
+                    try {
+                        connectdic[peer_to].send({ "type": "p2p", "time": new Date().getTime(), "data": val, "uuid": peer.id });
+                        addto(val, new Date().getTime(), 1, peer.id);
+                    } catch (e) {
+                        console.log(e);
+                        sendtoothers({ "type": "relay", "time": new Date().getTime(), "data": encryptit(val, onlinelis_pub[onlinelis_uuid.indexOf(peer_to)]), "uuid": peer.id });
+                        addto(val, new Date().getTime(), 1, peer.id);
+                    }
+                })
+            }
+            else if (peer_to == null && val != "") {
+                console.log("all")
+                sendtoothers({ "type": "all", "time": new Date().getTime(), "data": val, "uuid": peer.id });
+                addto(val, new Date().getTime(), 1, peer.id);
+            }
+            $("#msgbox").val("");
+        })
+
+        socket.on('onlinelist', function (msg) {
+            onlinelis_all = msg['lis'];
+            onlinelis_uuid = [];
+            onlinelis_pub = [];
+            for (let i = 0; i < onlinelis_all.length; i++) {
+                if (onlinelis_all[i][0] == peer.id) { continue; }
+                onlinelis_uuid.push(onlinelis_all[i][0]);
+                onlinelis_pub.push(onlinelis_all[i][1]);
+            }
+        })
+        function beat() {
+            socket.emit('beat', { "room": roomnm, "uuid": peer.id });
+        }
+        setInterval(beat, 30000);
+    </script>
+</body>
+
+</html>

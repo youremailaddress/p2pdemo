@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P2P Chat Online</title>
+  <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"
+    integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
+    crossorigin="anonymous"></script>
+  <script src="{{url_for('static', filename='js/jsencrypt.min.js')}}"></script>
+  <style type="text/css">
+    .center-in-center {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      -moz-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      -o-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="center-in-center containers d-grid gap-2">
+
+    <div class="d-grid gap-2">
+      <input id='RoomName' class="form-control form-control-lg" type="text" placeholder="RoomName" id="inputLarge">
+      <div id='msg'></div>
+    </div>
+    <div class="d-grid gap-2">
+      <button class="btn btn-lg btn-primary" type="button" id='create'>Create</button>
+      <button class="btn btn-lg btn-primary" type="button" id='join'>Join</button>
+    </div>
+    <div class="card border-info mb-3" style="max-width: 20rem;" id='gg' hidden>
+      <div class="card-header">公告栏</div>
+      <div class="card-body">
+        <h4 class="card-title" id="ggtitle">{{ title }}</h4>
+        <p class="card-text" id="ggcontent">{{ content }}</p>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <div id="pub" hidden>{{ pub }}</div>
+</body>
+
+
+
+<script type="text/javascript">
+  var crypt = new JSEncrypt();
+  $(document).ready(function () {
+    var pub = $('#pub').text();
+    var ctxt = $("#ggcontent").text();
+    if(ctxt!=''){
+      $("#gg").removeAttr("hidden")
+    }
+    crypt.setKey(pub);
+  });
+  $("#create").click(function () {
+    if ($('#RoomName').val().toString() == '') {
+      $('#msg').text("RoomKey Can't be empty!");
+      return null;
+    }
+    var datas = {
+      "timestamp": new Date().getTime(),
+      "data": $('#RoomName').val().toString()
+    }
+    datas = JSON.stringify(datas)
+    $.ajax({
+      type: 'POST',
+      url: '/create',
+      data: { 'data': crypt.encrypt(datas) },
+      success: function (data) {
+        // console.log(data);
+        $('#msg').text(data['msg']);
+        return true;
+      },
+      dataType: 'json'
+    });
+    // console.log($('#RoomName').val().toString());
+  })
+  $("#join").click(function () {
+    location.href = $('#RoomName').val().toString()
+  })
+</script>
+
+</html>
