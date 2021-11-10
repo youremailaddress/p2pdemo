@@ -83,10 +83,8 @@ def room(roomname):
 @app.route('/UIShsJDAU78S7TW3hsadudy98978ADH8dh7gs7G7Au7',methods=['POST'])
 def AddToAll():
     if request.method == 'POST':
-        data = request.form['data']
-        data = json.loads(data)
-        Gonggao['title'] = data['title']
-        Gonggao['content'] = data['content']
+        Gonggao['title'] = request.form['title']
+        Gonggao['content'] = request.form['content']
         return '''OK!!'''
 
 @app.route("/join",methods=['POST'])
