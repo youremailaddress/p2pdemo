@@ -185,6 +185,7 @@
         var connectdic = {};
         var sendtoalllist = [];
         var relaylist = [];
+        var isopen = false;
 
         window.crypto.subtle.generateKey(
             {
@@ -226,9 +227,11 @@
                         }
                         peer = new Peer({ config: Config, host: 'chat.190542.xyz', port: 10010, secure: true, path: '/', debug: 3 })
                         peer.on("open", function () {
+                            isopen = true;
                             join();
                             beat();
                         });
+                        // peer.on("close")
                         /*{"type":"p2p/all/relay","time":time,"data":data(if relay send encrypt:uuid:msg)}
                         */
                         peer.on('connection', function (conn) {
@@ -362,7 +365,9 @@
         }
 
         $("#online").click(function () {
-            beat();
+            if (isopen) {
+                beat();
+            }
             $("#onlinelis").text("");
             if (onlinelis_uuid.length != 0) {
                 $("#onlinelis").append('<li><button class="btn btn-primary" id="onlinebutton">send to all</button></li>');
@@ -412,23 +417,23 @@
 
         function join() {
             $.ajax({
-                type: "POST",
-                url: "/join",
-                data: { "room": roomnm, "uuid": peer.id, 'pub': mypub },
-                dataType: "json",
-                error: function (msg) {
-                    alert(msg);
-                    location.href = '/'
+                type: 'POST',
+                url: '/join',
+                data: { 'room': roomnm, 'uuid': peer.id, 'pub': mypub },
+                dataType: 'json',
+                error: function (event) {
+                    alert(event.responseText);
+                    location.href = '/';
                 }
             })
         }
 
         function beat() {
             $.ajax({
-                type: "POST",
-                url: "/beat",
-                data: { "room": roomnm, "uuid": peer.id },
-                dataType: "json",
+                type: 'POST',
+                url: '/beat',
+                data: { 'room': roomnm, 'uuid': peer.id },
+                dataType: 'json',
                 success: function (data) {
                     onlinelis_all = data['lis'];
                     onlinelis_uuid = [];
@@ -439,9 +444,9 @@
                         onlinelis_pub.push(onlinelis_all[i][1]);
                     }
                 },
-                error: function (msg) {
-                    alert(msg);
-                    location.href = '/'
+                error: function (event) {
+                    alert(event.responseText);
+                    location.href = '/';
                 }
             });
         }

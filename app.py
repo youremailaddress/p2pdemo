@@ -92,14 +92,9 @@ def AddToAll():
 @app.route("/join",methods=['POST'])
 def join():
     if request.method == 'POST':
-        data = request.form['data']
-        try:
-            data = json.loads(data)
-            room = data['room']
-            uuid = data['uuid']
-            pub = data['pub']
-        except:
-            return "synax error!"
+        room = request.form['room']
+        uuid = request.form['uuid']
+        pub = request.form['pub']
         if room not in getrooms():
             return "refuse"
         else:
@@ -108,20 +103,15 @@ def join():
                 item['onlinelist'] = [(uuid,pub,int(time.time()))]
             else:
                 item['onlinelist'].append((uuid,pub,int(time.time())))
-            return {"status":"ok"}
+            return '''{"status":"ok"}'''
     else:
         return "Unsupported method!"
 
 @app.route('/beat',methods=['POST'])
 def beat():
     if request.method == 'POST':
-        data = request.form['data']
-        try:
-            data = json.loads(data)
-            room = data['room']
-            uuid = data['uuid']
-        except:
-            return "synax error!"
+        room = request.form['room']
+        uuid = request.form['uuid']
         if room not in getrooms():
             return "refuse"
         else:
@@ -138,7 +128,7 @@ def beat():
                     elif int(time.time()) - tim >40:
                         lis.remove(it)
                 item['onlinelist'] = lis
-                return {"lis":lis}
+                return json.dumps({"lis":lis})
     else:
         return "Unsupported method!"
 
