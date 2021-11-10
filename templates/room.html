@@ -151,9 +151,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
         integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
         crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"
-        integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
-        crossorigin="anonymous"></script>
     <script src="{{url_for('static', filename='js/lib/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/lib/simplebar/simplebar.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/lib/node-waves/waves.min.js')}}"></script>
@@ -174,7 +171,6 @@
         $(document).ready(function () {
             sever_pub = $('#pub').text();
         });
-        var socket = io();
         function bin2text(bin) { return btoa(String.fromCharCode(...new Uint8Array(bin))); }
         var mypub = null;
         var mysec = null;
@@ -230,8 +226,8 @@
                         }
                         peer = new Peer({ config: Config, host: 'chat.190542.xyz', port: 10010, secure: true, path: '/', debug: 3 })
                         peer.on("open", function () {
-                            socket.emit('join', { "room": roomnm, "uuid": peer.id, 'pub': mypub });
-                            socket.emit('getpeoplelist', { "room": roomnm });
+                            join();
+                            beat();
                         });
                         /*{"type":"p2p/all/relay","time":time,"data":data(if relay send encrypt:uuid:msg)}
                         */
@@ -251,7 +247,7 @@
                                     }
                                 } else if (data['type'] == "all") {
                                     if (checkednohash(data['data'], sendtoalllist)) {
-                                        console.log(data['data'],sendtoalllist);
+                                        console.log(data['data'], sendtoalllist);
                                         addto(data['data'], data['time'], 0, data['uuid']);
                                         sendtoothers(data);
                                     }
@@ -291,9 +287,9 @@
         }
 
         function checkednohash(msg, list) {
-            if(list.indexOf(msg) != -1){
+            if (list.indexOf(msg) != -1) {
                 return false
-            }else{
+            } else {
                 list.push(msg);
                 return true;
             }
@@ -311,7 +307,7 @@
                 connectdic[rdmpr].on('open', function () {
                     // connectdic[rdmpr].send("through");
                     for (var key in connectdic) {
-                        if (!connectdic[key].open) { delete connectdic[key];continue; }
+                        if (!connectdic[key].open) { delete connectdic[key]; continue; }
                         connectdic[key].send(data);
                     }
                 })
@@ -366,7 +362,7 @@
         }
 
         $("#online").click(function () {
-            socket.emit('getpeoplelist', { "room": roomnm });
+            beat();
             $("#onlinelis").text("");
             if (onlinelis_uuid.length != 0) {
                 $("#onlinelis").append('<li><button class="btn btn-primary" id="onlinebutton">send to all</button></li>');
@@ -390,7 +386,7 @@
             }
         })
         $("#submitit").click(function () {
-            var val=$("#msgbox").val();
+            var val = $("#msgbox").val();
             if (peer_to != null && val != "") {
                 if (!connectdic[peer_to] || !connectdic[peer_to].open) {
                     connectdic[peer_to] = peer.connect(peer_to);
@@ -414,18 +410,40 @@
             $("#msgbox").val("");
         })
 
-        socket.on('onlinelist', function (msg) {
-            onlinelis_all = msg['lis'];
-            onlinelis_uuid = [];
-            onlinelis_pub = [];
-            for (let i = 0; i < onlinelis_all.length; i++) {
-                if (onlinelis_all[i][0] == peer.id) { continue; }
-                onlinelis_uuid.push(onlinelis_all[i][0]);
-                onlinelis_pub.push(onlinelis_all[i][1]);
-            }
-        })
+        function join() {
+            $.ajax({
+                type: "POST",
+                url: "/join",
+                data: { "room": roomnm, "uuid": peer.id, 'pub': mypub },
+                dataType: "json",
+                error: function (msg) {
+                    alert(msg);
+                    location.href = '/'
+                }
+            })
+        }
+
         function beat() {
-            socket.emit('beat', { "room": roomnm, "uuid": peer.id });
+            $.ajax({
+                type: "POST",
+                url: "/beat",
+                data: { "room": roomnm, "uuid": peer.id },
+                dataType: "json",
+                success: function (data) {
+                    onlinelis_all = data['lis'];
+                    onlinelis_uuid = [];
+                    onlinelis_pub = [];
+                    for (let i = 0; i < onlinelis_all.length; i++) {
+                        if (onlinelis_all[i][0] == peer.id) { continue; }
+                        onlinelis_uuid.push(onlinelis_all[i][0]);
+                        onlinelis_pub.push(onlinelis_all[i][1]);
+                    }
+                },
+                error: function (msg) {
+                    alert(msg);
+                    location.href = '/'
+                }
+            });
         }
         setInterval(beat, 30000);
     </script>

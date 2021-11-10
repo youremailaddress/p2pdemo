@@ -4,8 +4,6 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
 from flask import Flask, request, abort,jsonify,render_template,copy_current_request_context
 import datetime,json
-from flask_socketio import SocketIO, emit, join_room, leave_room, \
-    close_room, rooms, disconnect
 from keys import pub,sec
 
 key = RSA.importKey(pub)
@@ -22,7 +20,6 @@ def decrypt_data(seckey,encrypt_msg):
     return back_text.decode('utf-8')
 
 app = Flask(__name__)
-socketio = SocketIO(app)
 thread = None
 thread_lock = Lock()
 _dataStore = []
@@ -92,41 +89,58 @@ def AddToAll():
         Gonggao['content'] = data['content']
         return '''OK!!'''
 
-@socketio.event
-def getpeoplelist(msg):
-    if msg['room'] not in getrooms():
-        return
+@app.route("/join",methods=['POST'])
+def join():
+    if request.method == 'POST':
+        data = request.form['data']
+        try:
+            data = json.loads(data)
+            room = data['room']
+            uuid = data['uuid']
+            pub = data['pub']
+        except:
+            return "synax error!"
+        if room not in getrooms():
+            return "refuse"
+        else:
+            item = getdicbyroomname(room)
+            if item.get('onlinelist') == None:
+                item['onlinelist'] = [(uuid,pub,int(time.time()))]
+            else:
+                item['onlinelist'].append((uuid,pub,int(time.time())))
+            return {"status":"ok"}
     else:
-        emit("onlinelist",{"lis":getdicbyroomname(msg['room'])['onlinelist']})
+        return "Unsupported method!"
 
-@socketio.event
-def join(msg):
-    if msg["room"] not in getrooms():
-        return
-    else:
-        item = getdicbyroomname(msg['room'])
-        if item.get('onlinelist') == None:
-            item['onlinelist']= [(msg['uuid'],msg['pub'],int(time.time()))]
+@app.route('/beat',methods=['POST'])
+def beat():
+    if request.method == 'POST':
+        data = request.form['data']
+        try:
+            data = json.loads(data)
+            room = data['room']
+            uuid = data['uuid']
+        except:
+            return "synax error!"
+        if room not in getrooms():
+            return "refuse"
         else:
-            item['onlinelist'].append((msg['uuid'],msg['pub'],int(time.time())))
-@socketio.event
-def beat(msg):
-    if msg["room"] not in getrooms():
-        return
+            item = getdicbyroomname(room)
+            if item.get('onlinelist') == None:
+                return "unexcepted error"
+            else:
+                lis = item.get('onlinelist')
+                for it in lis[::]:
+                    uuid_,_,tim = it
+                    if uuid_ == uuid:
+                        lis.remove(it)
+                        lis.append((uuid_,_,int(time.time())))
+                    elif int(time.time()) - tim >40:
+                        lis.remove(it)
+                item['onlinelist'] = lis
+                return {"lis":lis}
     else:
-        item = getdicbyroomname(msg['room'])
-        if item.get('onlinelist') == None:
-            return
-        else:
-            lis = item.get('onlinelist')
-            for it in lis[::]:
-                uuid,_,tim = it
-                if uuid == msg['uuid']:
-                    lis.remove(it)
-                    lis.append((uuid,_,int(time.time())))
-                elif int(time.time())-tim > 120:
-                    lis.remove(it)
-            item['onlinelist'] = lis
+        return "Unsupported method!"
 
 if __name__ == '__main__':
-    socketio.run(app,port=1921)
+    app.run(port=1921)
