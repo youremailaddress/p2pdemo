@@ -24,6 +24,7 @@ thread = None
 thread_lock = Lock()
 _dataStore = []
 Gonggao = {'title':'','content':''}
+people = 0
 
 def getrooms():
     returnlis = []
@@ -42,7 +43,7 @@ def write_log(s):
 
 @app.route('/',methods=['GET'])
 def index():
-    return render_template('index.html',pub=pub,title=Gonggao['title'],content=Gonggao['content'])
+    return render_template('index.html',pub=pub,title=Gonggao['title'],content=Gonggao['content'],people=people)
 
 @app.route('/create',methods=['POST'])
 def create():
@@ -97,6 +98,8 @@ def join():
             return "refuse"
         else:
             item = getdicbyroomname(room)
+            global people
+            people += 1
             if item.get('onlinelist') == None:
                 item['onlinelist'] = [(uuid,pub,int(time.time()))]
             else:
@@ -125,6 +128,8 @@ def beat():
                         lis.append((uuid_,_,int(time.time())))
                     elif int(time.time()) - tim >40:
                         lis.remove(it)
+                        global people
+                        people -= 1
                 item['onlinelist'] = lis
                 return json.dumps({"lis":lis})
     else:

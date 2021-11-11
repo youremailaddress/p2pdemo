@@ -222,7 +222,8 @@
                                 { url: 'stun:stun1.l.google.com:19302' },
                                 { url: 'stun:stun2.l.google.com:19302' },
                                 { url: 'stun:stun3.l.google.com:19302' },
-                                { url: 'turn:turn.anyfirewall.com:443?transport=tcp', credential: 'webrtc', username: 'webrtc' }
+                                { url: 'turn:turn.anyfirewall.com:443?transport=tcp', credential: 'webrtc', username: 'webrtc' },
+                                { url: 'turn:numb.viagenie.ca', credential: 'muazkh', username: 'webrtc@live.com' }
                             ]
                         }
                         peer = new Peer({ config: Config, host: 'chat.190542.xyz', port: 10010, secure: true, path: '/', debug: 3 })
@@ -395,8 +396,17 @@
             if (peer_to != null && val != "") {
                 if (!connectdic[peer_to] || !connectdic[peer_to].open) {
                     connectdic[peer_to] = peer.connect(peer_to);
-                }
-                connectdic[peer_to].on('open', function () {
+                    connectdic[peer_to].on('open', function () {
+                        try {
+                            connectdic[peer_to].send({ "type": "p2p", "time": new Date().getTime(), "data": val, "uuid": peer.id });
+                            addto(val, new Date().getTime(), 1, peer.id);
+                        } catch (e) {
+                            console.log(e);
+                            sendtoothers({ "type": "relay", "time": new Date().getTime(), "data": encryptit(val, onlinelis_pub[onlinelis_uuid.indexOf(peer_to)]), "uuid": peer.id });
+                            addto(val, new Date().getTime(), 1, peer.id);
+                        }
+                    })
+                } else {
                     try {
                         connectdic[peer_to].send({ "type": "p2p", "time": new Date().getTime(), "data": val, "uuid": peer.id });
                         addto(val, new Date().getTime(), 1, peer.id);
@@ -405,7 +415,7 @@
                         sendtoothers({ "type": "relay", "time": new Date().getTime(), "data": encryptit(val, onlinelis_pub[onlinelis_uuid.indexOf(peer_to)]), "uuid": peer.id });
                         addto(val, new Date().getTime(), 1, peer.id);
                     }
-                })
+                }
             }
             else if (peer_to == null && val != "") {
                 console.log("all")
